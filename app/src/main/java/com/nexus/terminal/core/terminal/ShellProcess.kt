@@ -25,6 +25,11 @@ class ShellProcess(
         onOutput: (String) -> Unit
     ) = withContext(Dispatchers.IO) {
         try {
+            if (!workingDir.exists()) {
+                workingDir.mkdirs()
+            }
+            val tmpDir = File(workingDir, "tmp").apply { if (!exists()) mkdirs() }
+
             val processBuilder = ProcessBuilder(command)
             processBuilder.directory(workingDir)
             processBuilder.redirectErrorStream(true)
@@ -35,7 +40,7 @@ class ShellProcess(
             val customBinPath = "${workingDir.absolutePath}/bin:/data/data/com.nexus.terminal/files/bin"
             env["PATH"] = "$customBinPath:$currentPath"
             env["HOME"] = workingDir.absolutePath
-            env["TMPDIR"] = "${workingDir.absolutePath}/tmp"
+            env["TMPDIR"] = tmpDir.absolutePath
             env["TERM"] = "xterm-256color"
             env["LANG"] = "en_US.UTF-8"
             env["LC_ALL"] = "en_US.UTF-8"
@@ -55,12 +60,18 @@ class ShellProcess(
             val buffer = CharArray(1024)
             var charsRead = 0
 
-            while (isRunning && reader.read(buffer).also { charsRead = it } != -1) {
-                val output = String(buffer, 0, charsRead)
-                onOutput(output)
+            while (isRunning) {
+                try {
+                    charsRead = reader.read(buffer)
+                    if (charsRead == -1) break
+                    val output = String(buffer, 0, charsRead)
+                    onOutput(output)
+                } catch (e: Exception) {
+                    break
+                }
             }
 
-            val exitCode = proc.waitFor()
+            val exitCode = try { proc.waitFor() } catch (e: Exception) { 0 }
             isRunning = false
             onOutput("\n[Processo finalizado com código: $exitCode]\n")
         } catch (e: Exception) {
@@ -82,13 +93,11 @@ class ShellProcess(
 
     fun sendSigInt() {
         try {
-            // ASCII 0x03 is Ctrl+C (ETX)
             outputStream?.let {
                 it.write(byteArrayOf(3))
                 it.flush()
             }
         } catch (e: Exception) {
-            // Fallback: destroy process
             destroy()
         }
     }
@@ -108,16 +117,14 @@ class ShellProcess(
 
     companion object {
         fun detectDefaultShell(): List<String> {
-            val bash = File("/bin/bash")
-            if (bash.exists() && bash.canExecute()) {
-                return listOf("/bin/bash", "-i")
+            val candidates = listOf("/bin/bash", "/bin/sh", "/system/bin/sh")
+            for (path in candidates) {
+                val f = File(path)
+                if (f.exists() && f.canExecute()) {
+                    return listOf(path)
+                }
             }
-            val sh = File("/bin/sh")
-            if (sh.exists() && sh.canExecute()) {
-                return listOf("/bin/sh", "-i")
-            }
-            // Android default shell
-            return listOf("/system/bin/sh", "-i")
+            return listOf("sh")
         }
     }
 }

@@ -15,12 +15,6 @@ class MainActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityMainBinding
 
-    private val dashboardFragment = DashboardFragment()
-    private val terminalFragment = TerminalFragment()
-    private val editorFragment = EditorFragment()
-    private val filesFragment = FilesFragment()
-    private val toolsFragment = ToolsFragment()
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
@@ -29,7 +23,7 @@ class MainActivity : AppCompatActivity() {
         setupBottomNavigation()
 
         if (savedInstanceState == null) {
-            showFragment(dashboardFragment)
+            showFragment(DashboardFragment(), TAG_DASHBOARD)
         }
     }
 
@@ -37,23 +31,23 @@ class MainActivity : AppCompatActivity() {
         binding.bottomNavigation.setOnItemSelectedListener { item ->
             when (item.itemId) {
                 R.id.nav_dashboard -> {
-                    showFragment(dashboardFragment)
+                    showFragment(DashboardFragment(), TAG_DASHBOARD)
                     true
                 }
                 R.id.nav_terminal -> {
-                    showFragment(terminalFragment)
+                    showFragment(TerminalFragment(), TAG_TERMINAL)
                     true
                 }
                 R.id.nav_editor -> {
-                    showFragment(editorFragment)
+                    showFragment(EditorFragment(), TAG_EDITOR)
                     true
                 }
                 R.id.nav_files -> {
-                    showFragment(filesFragment)
+                    showFragment(FilesFragment(), TAG_FILES)
                     true
                 }
                 R.id.nav_tools -> {
-                    showFragment(toolsFragment)
+                    showFragment(ToolsFragment(), TAG_TOOLS)
                     true
                 }
                 else -> false
@@ -61,10 +55,15 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    fun showFragment(fragment: Fragment) {
-        supportFragmentManager.beginTransaction()
-            .replace(R.id.nav_host_fragment, fragment)
-            .commit()
+    fun showFragment(fragment: Fragment, tag: String? = null) {
+        if (isFinishing || isDestroyed) return
+        try {
+            supportFragmentManager.beginTransaction()
+                .replace(R.id.nav_host_fragment, fragment, tag)
+                .commitAllowingStateLoss()
+        } catch (e: Exception) {
+            // Guard against edge-case fragment transaction states
+        }
     }
 
     fun navigateToTerminal() {
@@ -72,13 +71,20 @@ class MainActivity : AppCompatActivity() {
     }
 
     fun navigateToEditor(fileToOpen: File? = null) {
-        if (fileToOpen != null) {
-            editorFragment.openFile(fileToOpen)
-        }
-        binding.bottomNavigation.selectedItemId = R.id.nav_editor
+        val editorFrag = EditorFragment.newInstance(fileToOpen?.absolutePath)
+        showFragment(editorFrag, TAG_EDITOR)
+        binding.bottomNavigation.menu.findItem(R.id.nav_editor)?.isChecked = true
     }
 
     fun navigateToFiles() {
         binding.bottomNavigation.selectedItemId = R.id.nav_files
+    }
+
+    companion object {
+        const val TAG_DASHBOARD = "frag_dashboard"
+        const val TAG_TERMINAL = "frag_terminal"
+        const val TAG_EDITOR = "frag_editor"
+        const val TAG_FILES = "frag_files"
+        const val TAG_TOOLS = "frag_tools"
     }
 }

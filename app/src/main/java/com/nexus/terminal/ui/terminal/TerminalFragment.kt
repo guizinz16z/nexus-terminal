@@ -41,7 +41,7 @@ class TerminalFragment : Fragment() {
 
     private fun setupTerminalTabs() {
         binding.btnNewSession.setOnClickListener {
-            val session = TerminalSessionManager.createNewSession(
+            TerminalSessionManager.createNewSession(
                 workingDir = NexusApplication.instance.workspaceDir
             )
             refreshTabsUI()
@@ -57,12 +57,12 @@ class TerminalFragment : Fragment() {
     }
 
     private fun refreshTabsUI() {
+        val b = _binding ?: return
         val sessions = TerminalSessionManager.sessionsFlow.value
         val active = TerminalSessionManager.activeSessionFlow.value
 
-        // Remove all children except the new session button
-        binding.layoutSessionTabs.removeAllViews()
-        binding.layoutSessionTabs.addView(binding.btnNewSession)
+        b.layoutSessionTabs.removeAllViews()
+        b.layoutSessionTabs.addView(b.btnNewSession)
 
         for (session in sessions) {
             val tabView = TextView(requireContext()).apply {
@@ -82,7 +82,7 @@ class TerminalFragment : Fragment() {
                     refreshTabsUI()
                 }
             }
-            binding.layoutSessionTabs.addView(tabView, 0)
+            b.layoutSessionTabs.addView(tabView, 0)
         }
     }
 
@@ -98,7 +98,6 @@ class TerminalFragment : Fragment() {
         }
 
         binding.keyCtrl.setOnClickListener {
-            // Sends Ctrl key indicator / prefix
             getActive()?.sendRaw("\u0000")
         }
 
@@ -108,21 +107,25 @@ class TerminalFragment : Fragment() {
 
         binding.keyUp.setOnClickListener {
             val prevCmd = getActive()?.getPreviousCommand()
-            if (prevCmd != null) {
-                binding.etTerminalInput.setText(prevCmd)
-                binding.etTerminalInput.setSelection(prevCmd.length)
-            } else {
-                getActive()?.sendRaw("\u001B[A")
+            _binding?.let { b ->
+                if (prevCmd != null) {
+                    b.etTerminalInput.setText(prevCmd)
+                    b.etTerminalInput.setSelection(prevCmd.length)
+                } else {
+                    getActive()?.sendRaw("\u001B[A")
+                }
             }
         }
 
         binding.keyDown.setOnClickListener {
             val nextCmd = getActive()?.getNextCommand()
-            if (nextCmd != null) {
-                binding.etTerminalInput.setText(nextCmd)
-                binding.etTerminalInput.setSelection(nextCmd.length)
-            } else {
-                getActive()?.sendRaw("\u001B[B")
+            _binding?.let { b ->
+                if (nextCmd != null) {
+                    b.etTerminalInput.setText(nextCmd)
+                    b.etTerminalInput.setSelection(nextCmd.length)
+                } else {
+                    getActive()?.sendRaw("\u001B[B")
+                }
             }
         }
 
@@ -145,11 +148,17 @@ class TerminalFragment : Fragment() {
         binding.keyDash.setOnClickListener {
             insertTextToInput("-")
         }
+
+        binding.keyTilde.setOnClickListener {
+            insertTextToInput("~")
+        }
     }
 
     private fun insertTextToInput(text: String) {
-        val cursor = binding.etTerminalInput.selectionStart
-        binding.etTerminalInput.text.insert(cursor, text)
+        _binding?.let { b ->
+            val cursor = b.etTerminalInput.selectionStart.coerceAtLeast(0)
+            b.etTerminalInput.text.insert(cursor, text)
+        }
     }
 
     private fun setupCommandInput() {
@@ -168,10 +177,12 @@ class TerminalFragment : Fragment() {
     }
 
     private fun submitCommand() {
-        val command = binding.etTerminalInput.text.toString()
-        if (command.isNotBlank()) {
-            TerminalSessionManager.activeSessionFlow.value?.executeCommand(command)
-            binding.etTerminalInput.text.clear()
+        _binding?.let { b ->
+            val command = b.etTerminalInput.text.toString()
+            if (command.isNotBlank()) {
+                TerminalSessionManager.activeSessionFlow.value?.executeCommand(command)
+                b.etTerminalInput.text.clear()
+            }
         }
     }
 
@@ -180,10 +191,10 @@ class TerminalFragment : Fragment() {
             TerminalSessionManager.activeSessionFlow.collectLatest { session ->
                 refreshTabsUI()
                 session?.outputFlow?.collectLatest { text ->
-                    if (_binding != null) {
-                        binding.tvTerminalOutput.text = text
-                        binding.scrollTerminalOutput.post {
-                            binding.scrollTerminalOutput.fullScroll(View.FOCUS_DOWN)
+                    _binding?.let { b ->
+                        b.tvTerminalOutput.text = text
+                        b.scrollTerminalOutput.post {
+                            _binding?.scrollTerminalOutput?.fullScroll(View.FOCUS_DOWN)
                         }
                     }
                 }

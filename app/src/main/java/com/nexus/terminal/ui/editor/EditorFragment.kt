@@ -47,24 +47,39 @@ class EditorFragment : Fragment() {
         setupSymbolKeys()
         setupActions()
 
-        if (currentFile == null) {
-            val defaultScript = File(NexusApplication.instance.workspaceDir, "main.py")
-            openFile(defaultScript)
+        // Check if a file path was passed in arguments
+        val pathFromArgs = arguments?.getString(ARG_FILE_PATH)
+        val targetFile = if (!pathFromArgs.isNullOrEmpty()) {
+            File(pathFromArgs)
+        } else {
+            currentFile ?: File(NexusApplication.instance.workspaceDir, "main.py")
         }
+
+        loadFileContent(targetFile)
     }
 
     fun openFile(file: File) {
         currentFile = file
         currentLanguage = LanguageType.fromFileName(file.name)
+        if (_binding != null) {
+            loadFileContent(file)
+        }
+    }
+
+    private fun loadFileContent(file: File) {
+        currentFile = file
+        currentLanguage = LanguageType.fromFileName(file.name)
 
         viewLifecycleOwner.lifecycleScope.launch {
             val content = FileManager.readText(file)
-            isUpdatingTextInternally = true
-            binding.etCodeEditor.setText(content)
-            binding.tvActiveFileTab.text = file.name
-            isUpdatingTextInternally = false
-            updateLineNumbers()
-            triggerSyntaxHighlight()
+            _binding?.let { b ->
+                isUpdatingTextInternally = true
+                b.etCodeEditor.setText(content)
+                b.tvActiveFileTab.text = file.name
+                isUpdatingTextInternally = false
+                updateLineNumbers()
+                triggerSyntaxHighlight()
+            }
         }
     }
 
@@ -81,20 +96,21 @@ class EditorFragment : Fragment() {
     }
 
     private fun updateLineNumbers() {
-        val lineCount = binding.etCodeEditor.lineCount.coerceAtLeast(1)
-        val sb = java.lang.StringBuilder()
-        for (i in 1..lineCount) {
-            sb.append(i).append("\n")
+        _binding?.let { b ->
+            val lineCount = b.etCodeEditor.lineCount.coerceAtLeast(1)
+            val sb = java.lang.StringBuilder()
+            for (i in 1..lineCount) {
+                sb.append(i).append("\n")
+            }
+            b.tvLineNumbers.text = sb.toString()
         }
-        binding.tvLineNumbers.text = sb.toString()
     }
 
     private fun triggerSyntaxHighlight() {
         highlightJob?.cancel()
         highlightJob = viewLifecycleOwner.lifecycleScope.launch {
             delay(150) // Debounce for smooth 60 FPS mobile typing
-            val editable = binding.etCodeEditor.text
-            if (editable != null) {
+            _binding?.etCodeEditor?.text?.let { editable ->
                 isUpdatingTextInternally = true
                 SyntaxHighlighter.highlight(editable, currentLanguage)
                 isUpdatingTextInternally = false
@@ -104,8 +120,10 @@ class EditorFragment : Fragment() {
 
     private fun setupSymbolKeys() {
         val insert = { sym: String ->
-            val start = binding.etCodeEditor.selectionStart
-            binding.etCodeEditor.text.insert(start, sym)
+            _binding?.let { b ->
+                val start = b.etCodeEditor.selectionStart.coerceAtLeast(0)
+                b.etCodeEditor.text.insert(start, sym)
+            }
         }
 
         binding.symTab.setOnClickListener { insert("    ") }
@@ -129,11 +147,13 @@ class EditorFragment : Fragment() {
             val content = binding.etCodeEditor.text.toString()
             viewLifecycleOwner.lifecycleScope.launch {
                 val ok = FileManager.writeText(file, content)
-                Toast.makeText(
-                    requireContext(),
-                    if (ok) "✓ Arquivo salvo com sucesso!" else "Falha ao salvar",
-                    Toast.LENGTH_SHORT
-                ).show()
+                context?.let { ctx ->
+                    Toast.makeText(
+                        ctx,
+                        if (ok) "✓ Arquivo salvo com sucesso!" else "Falha ao salvar",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }
             }
         }
 
@@ -162,12 +182,14 @@ class EditorFragment : Fragment() {
         viewLifecycleOwner.lifecycleScope.launch {
             FileManager.writeText(file, content)
 
-            binding.layoutOutputDrawer.visibility = View.VISIBLE
-            binding.tvScriptOutput.text = "★ Executando: ${file.name}...\n\n"
+            _binding?.let { b ->
+                b.layoutOutputDrawer.visibility = View.VISIBLE
+                b.tvScriptOutput.text = "★ Executando: ${file.name}...\n\n"
+            }
 
             NexusApplication.instance.pythonEngine.executeScript(file) { chunk ->
                 activity?.runOnUiThread {
-                    binding.tvScriptOutput.append(chunk)
+                    _binding?.tvScriptOutput?.append(chunk)
                 }
             }
         }
@@ -175,6 +197,21 @@ class EditorFragment : Fragment() {
 
     override fun onDestroyView() {
         super.onDestroyView()
+        highlightJob?.cancel()
         _binding = null
+    }
+
+    companion object {
+        private const val ARG_FILE_PATH = "arg_file_path"
+
+        fun newInstance(filePath: String? = null): EditorFragment {
+            return EditorFragment().apply {
+                arguments = Bundle().apply {
+                    if (filePath != null) {
+                        putString(ARG_FILE_PATH, filePath)
+                    }
+                }
+            }
+        }
     }
 }

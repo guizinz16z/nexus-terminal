@@ -24,7 +24,7 @@ class TerminalSession(
     val outputFlow: StateFlow<CharSequence> = _outputFlow
 
     private val buffer = StringBuilder()
-    private val maxBufferLength = 200000
+    private val maxBufferLength = 30000 // Anti-ANR safe buffer limit for Android TextViews
 
     private val commandHistory = mutableListOf<String>()
     private var historyIndex = -1
@@ -40,9 +40,9 @@ class TerminalSession(
         val process = ShellProcess(workingDir)
         shellProcess = process
 
-        appendOutput("\u001B[1;36m★ NEXUS TERMINAL v1.0.0 Pro\u001B[0m\n")
+        appendOutput("\u001B[1;36m★ NEXUS TERMINAL v1.1.0 Pro\u001B[0m\n")
         appendOutput("\u001B[1;32m✓ Sessão iniciada em: \u001B[0m${workingDir.absolutePath}\n")
-        appendOutput("\u001B[1;35m➜ Digite 'help' ou comandos bash/linux.\u001B[0m\n\n")
+        appendOutput("\u001B[1;35m➜ Digite comandos Linux ou execute scripts Python.\u001B[0m\n\n")
 
         job = scope.launch {
             process.start { chunk ->
@@ -57,7 +57,11 @@ class TerminalSession(
             if (buffer.length > maxBufferLength) {
                 buffer.delete(0, buffer.length - maxBufferLength)
             }
-            _outputFlow.value = AnsiParser.parse(buffer.toString())
+            try {
+                _outputFlow.value = AnsiParser.parse(buffer.toString())
+            } catch (e: Exception) {
+                _outputFlow.value = buffer.toString()
+            }
         }
     }
 

@@ -90,7 +90,9 @@ class AiAssistantFragment : Fragment() {
                     val key = input.text.toString().trim()
                     NexusApplication.instance.preferences.aiApiKey = key
                     NexusApplication.instance.aiAssistantService.setApiKey(key)
-                    Toast.makeText(requireContext(), "Chave API salva!", Toast.LENGTH_SHORT).show()
+                    context?.let { ctx ->
+                        Toast.makeText(ctx, "Chave API salva!", Toast.LENGTH_SHORT).show()
+                    }
                 }
                 .setNegativeButton("Cancelar", null)
                 .show()
@@ -121,14 +123,18 @@ class AiAssistantFragment : Fragment() {
 
     private fun addUserMessage(text: String) {
         messages.add(AiMessage(sender = "user", content = text))
-        chatAdapter.updateMessages(messages)
-        binding.rvAiMessages.scrollToPosition(messages.size - 1)
+        _binding?.let { b ->
+            chatAdapter.updateMessages(messages)
+            b.rvAiMessages.scrollToPosition(messages.size - 1)
+        }
     }
 
     private fun addAssistantMessage(text: String) {
         messages.add(AiMessage(sender = "assistant", content = text))
-        chatAdapter.updateMessages(messages)
-        binding.rvAiMessages.scrollToPosition(messages.size - 1)
+        _binding?.let { b ->
+            chatAdapter.updateMessages(messages)
+            b.rvAiMessages.scrollToPosition(messages.size - 1)
+        }
     }
 
     override fun onDestroyView() {

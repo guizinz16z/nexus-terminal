@@ -45,13 +45,15 @@ class GitFragment : Fragment() {
             val msg = binding.etCommitMessage.text.toString().trim()
             if (msg.isNotEmpty()) {
                 viewLifecycleOwner.lifecycleScope.launch {
-                    val out = GitManager.commit(repoDir, msg)
-                    Toast.makeText(requireContext(), "Commit efetuado!", Toast.LENGTH_SHORT).show()
-                    binding.etCommitMessage.text.clear()
+                    GitManager.commit(repoDir, msg)
+                    context?.let { ctx ->
+                        Toast.makeText(ctx, "Commit efetuado!", Toast.LENGTH_SHORT).show()
+                    }
+                    _binding?.etCommitMessage?.text?.clear()
                     refreshGitStatus()
                 }
             } else {
-                Toast.makeText(requireContext(), "Insira uma mensagem de commit", Toast.LENGTH_SHORT).show()
+                Toast.makeText(context ?: return@setOnClickListener, "Insira uma mensagem de commit", Toast.LENGTH_SHORT).show()
             }
         }
 
@@ -62,14 +64,14 @@ class GitFragment : Fragment() {
         binding.btnGitPull.setOnClickListener {
             viewLifecycleOwner.lifecycleScope.launch {
                 val out = GitManager.pull(repoDir)
-                binding.tvGitStatusLog.text = out
+                _binding?.tvGitStatusLog?.text = out
             }
         }
 
         binding.btnGitPush.setOnClickListener {
             viewLifecycleOwner.lifecycleScope.launch {
                 val out = GitManager.push(repoDir)
-                binding.tvGitStatusLog.text = out
+                _binding?.tvGitStatusLog?.text = out
             }
         }
     }
@@ -77,22 +79,24 @@ class GitFragment : Fragment() {
     private fun refreshGitStatus() {
         viewLifecycleOwner.lifecycleScope.launch {
             val status = GitManager.getStatus(repoDir)
-            binding.tvGitBranch.text = "Branch Atual: ${status.branch}"
+            _binding?.let { b ->
+                b.tvGitBranch.text = "Branch Atual: ${status.branch}"
 
-            val sb = StringBuilder()
-            if (status.isClean) {
-                sb.append("✓ Diretório de trabalho limpo. Nenhuma alteração pendente.")
-            } else {
-                if (status.modifiedFiles.isNotEmpty()) {
-                    sb.append("Modificados:\n")
-                    status.modifiedFiles.forEach { sb.append("  • $it\n") }
+                val sb = StringBuilder()
+                if (status.isClean) {
+                    sb.append("✓ Diretório de trabalho limpo. Nenhuma alteração pendente.")
+                } else {
+                    if (status.modifiedFiles.isNotEmpty()) {
+                        sb.append("Modificados:\n")
+                        status.modifiedFiles.forEach { sb.append("  • $it\n") }
+                    }
+                    if (status.untrackedFiles.isNotEmpty()) {
+                        sb.append("\nNão rastreados:\n")
+                        status.untrackedFiles.forEach { sb.append("  ? $it\n") }
+                    }
                 }
-                if (status.untrackedFiles.isNotEmpty()) {
-                    sb.append("\nNão rastreados:\n")
-                    status.untrackedFiles.forEach { sb.append("  ? $it\n") }
-                }
+                b.tvGitStatusLog.text = sb.toString()
             }
-            binding.tvGitStatusLog.text = sb.toString()
         }
     }
 
@@ -113,7 +117,7 @@ class GitFragment : Fragment() {
                     viewLifecycleOwner.lifecycleScope.launch {
                         GitManager.clone(url, target) { log ->
                             activity?.runOnUiThread {
-                                binding.tvGitStatusLog.append(log)
+                                _binding?.tvGitStatusLog?.append(log)
                             }
                         }
                     }

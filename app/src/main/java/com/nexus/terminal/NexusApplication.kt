@@ -1,6 +1,7 @@
 package com.nexus.terminal
 
 import android.app.Application
+import android.util.Log
 import com.nexus.terminal.core.ai.AiAssistantService
 import com.nexus.terminal.core.project.ProjectManager
 import com.nexus.terminal.core.project.ProjectTemplateType
@@ -12,6 +13,8 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import java.io.File
+import java.io.PrintWriter
+import java.io.StringWriter
 
 class NexusApplication : Application() {
 
@@ -47,25 +50,59 @@ class NexusApplication : Application() {
         super.onCreate()
         instance = this
 
+        setupCrashHandler()
+
+        // Ensure essential directories exist
+        workspaceDir.mkdirs()
+        projectsDir.mkdirs()
+        File(workspaceDir, "tmp").mkdirs()
+        File(workspaceDir, "bin").mkdirs()
+
         preferences = AppPreferences(this)
         pythonEngine = PythonEngine(filesDir)
         pipManager = PipManager(pythonEngine, pythonEngine.userSitePackages)
         projectManager = ProjectManager(projectsDir)
         aiAssistantService = AiAssistantService(apiKey = preferences.aiApiKey)
 
-        // Initialize default terminal session
-        TerminalSessionManager.initDefaultSession(workspaceDir)
+        // Initialize default terminal session safely
+        try {
+            TerminalSessionManager.initDefaultSession(workspaceDir)
+        } catch (e: Exception) {
+            Log.e("NexusApp", "Failed to init default terminal session", e)
+        }
 
         // Bootstrap initial welcome project if empty
         CoroutineScope(Dispatchers.IO).launch {
-            val existing = projectManager.listProjects()
-            if (existing.isEmpty()) {
-                projectManager.createProject(
-                    name = "Nexus_QuickStart",
-                    template = ProjectTemplateType.TELEGRAM_BOT,
-                    description = "Projeto inicial de demonstração do Nexus Terminal."
-                )
+            try {
+                val existing = projectManager.listProjects()
+                if (existing.isEmpty()) {
+                    projectManager.createProject(
+                        name = "Nexus_QuickStart",
+                        template = ProjectTemplateType.TELEGRAM_BOT,
+                        description = "Projeto inicial de demonstração do Nexus Terminal."
+                    )
+                }
+            } catch (e: Exception) {
+                Log.e("NexusApp", "Failed to bootstrap quickstart project", e)
             }
+        }
+    }
+
+    private fun setupCrashHandler() {
+        val defaultHandler = Thread.getDefaultUncaughtExceptionHandler()
+        Thread.setDefaultUncaughtExceptionHandler { thread, throwable ->
+            try {
+                val sw = StringWriter()
+                throwable.printStackTrace(PrintWriter(sw))
+                val stackTrace = sw.toString()
+                Log.e("NexusCrash", "FATAL EXCEPTION in thread ${thread.name}: $stackTrace")
+
+                val crashFile = File(filesDir, "crash_log.txt")
+                crashFile.writeText("Time: ${System.currentTimeMillis()}\nThread: ${thread.name}\n$stackTrace")
+            } catch (e: Exception) {
+                // Prevent crash loop in handler
+            }
+            defaultHandler?.uncaughtException(thread, throwable)
         }
     }
 

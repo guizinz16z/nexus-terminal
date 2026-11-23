@@ -69,14 +69,14 @@ class ToolsFragment : Fragment() {
             .setPositiveButton("Executar") { _, _ ->
                 val target = input.text.toString().trim()
                 if (target.isNotEmpty()) {
-                    binding.tvToolOutput.text = "★ Executando teste de conectividade para $target...\n"
+                    _binding?.tvToolOutput?.text = "★ Executando teste de conectividade para $target...\n"
                     viewLifecycleOwner.lifecycleScope.launch {
                         val result = if (target.startsWith("http://") || target.startsWith("https://")) {
                             NetworkUtils.executeHttpRequest(target)
                         } else {
                             NetworkUtils.pingHost(target)
                         }
-                        binding.tvToolOutput.text = result
+                        _binding?.tvToolOutput?.text = result
                     }
                 }
             }
@@ -85,7 +85,7 @@ class ToolsFragment : Fragment() {
     }
 
     private fun loadProcesses() {
-        binding.tvToolOutput.text = "★ Carregando lista de processos ativos...\n"
+        _binding?.tvToolOutput?.text = "★ Carregando lista de processos ativos...\n"
         viewLifecycleOwner.lifecycleScope.launch {
             val processes = ProcessMonitor.listProcesses()
             val sb = StringBuilder("PID\t\tUSER\t\tCOMANDO\n")
@@ -93,7 +93,7 @@ class ToolsFragment : Fragment() {
             processes.take(25).forEach { p ->
                 sb.append("${p.pid}\t\t${p.user}\t\t${p.command}\n")
             }
-            binding.tvToolOutput.text = sb.toString()
+            _binding?.tvToolOutput?.text = sb.toString()
         }
     }
 
@@ -124,14 +124,14 @@ class ToolsFragment : Fragment() {
                     $b64
                 """.trimIndent()
 
-                binding.tvToolOutput.text = result
+                _binding?.tvToolOutput?.text = result
             }
             .setNegativeButton("Cancelar", null)
             .show()
     }
 
     private fun generateSshKey() {
-        binding.tvToolOutput.text = "★ Gerando par de chaves SSH RSA 2048-bit...\n"
+        _binding?.tvToolOutput?.text = "★ Gerando par de chaves SSH RSA 2048-bit...\n"
         viewLifecycleOwner.lifecycleScope.launch {
             val pair = SshKeyGen.generateRsaKeyPair()
             val output = """
@@ -143,7 +143,7 @@ class ToolsFragment : Fragment() {
                 Chave Privada:
                 ${pair.privateKey}
             """.trimIndent()
-            binding.tvToolOutput.text = output
+            _binding?.tvToolOutput?.text = output
         }
     }
 

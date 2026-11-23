@@ -79,50 +79,55 @@ class DashboardFragment : Fragment() {
         }
 
         binding.cardActionPackages.setOnClickListener {
-            mainActivity?.showFragment(PackagesFragment())
+            mainActivity?.showFragment(PackagesFragment(), "packages")
         }
 
         binding.cardActionGit.setOnClickListener {
-            mainActivity?.showFragment(GitFragment())
+            mainActivity?.showFragment(GitFragment(), "git")
         }
 
         binding.btnSeeAllProjects.setOnClickListener {
-            mainActivity?.showFragment(ProjectsFragment())
+            mainActivity?.showFragment(ProjectsFragment(), "projects")
         }
 
         binding.btnOpenSettings.setOnClickListener {
-            mainActivity?.showFragment(SettingsFragment())
+            mainActivity?.showFragment(SettingsFragment(), "settings")
         }
     }
 
     private fun loadSystemMetrics() {
+        val appContext = context?.applicationContext ?: NexusApplication.instance
         viewLifecycleOwner.lifecycleScope.launch(Dispatchers.Default) {
-            // RAM info
-            val actManager = requireContext().getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager
-            val memInfo = ActivityManager.MemoryInfo()
-            actManager.getMemoryInfo(memInfo)
+            try {
+                // RAM info
+                val actManager = appContext.getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager
+                val memInfo = ActivityManager.MemoryInfo()
+                actManager.getMemoryInfo(memInfo)
 
-            val totalRamGb = memInfo.totalMem / (1024.0 * 1024.0 * 1024.0)
-            val availRamGb = memInfo.availMem / (1024.0 * 1024.0 * 1024.0)
-            val usedRamGb = totalRamGb - availRamGb
-            val ramText = String.format(Locale.US, "%.1f / %.1f GB", usedRamGb, totalRamGb)
+                val totalRamGb = memInfo.totalMem / (1024.0 * 1024.0 * 1024.0)
+                val availRamGb = memInfo.availMem / (1024.0 * 1024.0 * 1024.0)
+                val usedRamGb = totalRamGb - availRamGb
+                val ramText = String.format(Locale.US, "%.1f / %.1f GB", usedRamGb, totalRamGb)
 
-            // Storage info
-            val stat = StatFs(Environment.getDataDirectory().path)
-            val bytesAvailable = stat.blockSizeLong * stat.availableBlocksLong
-            val freeStorageGb = bytesAvailable / (1024.0 * 1024.0 * 1024.0)
-            val storageText = String.format(Locale.US, "%.1f GB Livres", freeStorageGb)
+                // Storage info
+                val stat = StatFs(Environment.getDataDirectory().path)
+                val bytesAvailable = stat.blockSizeLong * stat.availableBlocksLong
+                val freeStorageGb = bytesAvailable / (1024.0 * 1024.0 * 1024.0)
+                val storageText = String.format(Locale.US, "%.1f GB Livres", freeStorageGb)
 
-            // Python version
-            val pyVersion = NexusApplication.instance.pythonEngine.getPythonVersion()
+                // Python version
+                val pyVersion = NexusApplication.instance.pythonEngine.getPythonVersion()
 
-            withContext(Dispatchers.Main) {
-                if (_binding != null) {
-                    binding.tvRamUsage.text = ramText
-                    binding.tvStorageUsage.text = storageText
-                    binding.tvPythonVersion.text = pyVersion
-                    binding.tvKernelInfo.text = "Android ${Build.VERSION.RELEASE} • ${Build.SUPPORTED_ABIS.firstOrNull() ?: "aarch64"}"
+                withContext(Dispatchers.Main) {
+                    _binding?.let { b ->
+                        b.tvRamUsage.text = ramText
+                        b.tvStorageUsage.text = storageText
+                        b.tvPythonVersion.text = pyVersion
+                        b.tvKernelInfo.text = "Android ${Build.VERSION.RELEASE} • ${Build.SUPPORTED_ABIS.firstOrNull() ?: "aarch64"}"
+                    }
                 }
+            } catch (e: Exception) {
+                // Ignore any metric read error gracefully
             }
         }
     }
@@ -130,7 +135,9 @@ class DashboardFragment : Fragment() {
     private fun loadProjects() {
         viewLifecycleOwner.lifecycleScope.launch {
             val projects = NexusApplication.instance.projectManager.listProjects()
-            projectsAdapter.updateProjects(projects.take(4))
+            _binding?.let {
+                projectsAdapter.updateProjects(projects.take(4))
+            }
         }
     }
 

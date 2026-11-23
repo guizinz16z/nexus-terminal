@@ -61,34 +61,40 @@ class PackagesFragment : Fragment() {
     }
 
     private fun installPackage(name: String) {
-        binding.tvPipLog.text = ""
-        binding.btnPipInstall.isEnabled = false
+        _binding?.let { b ->
+            b.tvPipLog.text = ""
+            b.btnPipInstall.isEnabled = false
+        }
 
         viewLifecycleOwner.lifecycleScope.launch {
             val success = NexusApplication.instance.pipManager.installPackage(name) { line ->
                 activity?.runOnUiThread {
-                    binding.tvPipLog.append(line)
+                    _binding?.tvPipLog?.append(line)
                 }
             }
-            binding.btnPipInstall.isEnabled = true
+            _binding?.btnPipInstall?.isEnabled = true
             if (success) {
-                Toast.makeText(requireContext(), "Pacote $name instalado!", Toast.LENGTH_SHORT).show()
-                binding.etPackageName.text.clear()
+                context?.let { ctx ->
+                    Toast.makeText(ctx, "Pacote $name instalado!", Toast.LENGTH_SHORT).show()
+                }
+                _binding?.etPackageName?.text?.clear()
                 loadInstalledPackages()
             }
         }
     }
 
     private fun uninstallPackage(name: String) {
-        binding.tvPipLog.text = ""
+        _binding?.tvPipLog?.text = ""
         viewLifecycleOwner.lifecycleScope.launch {
             val success = NexusApplication.instance.pipManager.uninstallPackage(name) { line ->
                 activity?.runOnUiThread {
-                    binding.tvPipLog.append(line)
+                    _binding?.tvPipLog?.append(line)
                 }
             }
             if (success) {
-                Toast.makeText(requireContext(), "Pacote $name removido!", Toast.LENGTH_SHORT).show()
+                context?.let { ctx ->
+                    Toast.makeText(ctx, "Pacote $name removido!", Toast.LENGTH_SHORT).show()
+                }
                 loadInstalledPackages()
             }
         }
@@ -97,7 +103,9 @@ class PackagesFragment : Fragment() {
     private fun loadInstalledPackages() {
         viewLifecycleOwner.lifecycleScope.launch {
             val installed = NexusApplication.instance.pipManager.listInstalledPackages()
-            packagesAdapter.updatePackages(installed)
+            _binding?.let {
+                packagesAdapter.updatePackages(installed)
+            }
         }
     }
 
