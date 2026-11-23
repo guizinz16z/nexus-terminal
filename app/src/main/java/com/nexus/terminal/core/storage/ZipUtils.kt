@@ -70,7 +70,7 @@ object ZipUtils {
                     } else {
                         newFile.parentFile?.mkdirs()
                         FileOutputStream(newFile).use { fos ->
-                            var len: Int
+                            var len = 0
                             while (zis.read(buffer).also { len = it } > 0) {
                                 fos.write(buffer, 0, len)
                             }

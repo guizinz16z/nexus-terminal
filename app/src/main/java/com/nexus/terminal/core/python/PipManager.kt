@@ -59,7 +59,7 @@ class PipManager(
 
             val proc = pb.start()
             val reader = BufferedReader(InputStreamReader(proc.inputStream))
-            var line: String?
+            var line: String? = null
             while (reader.readLine().also { line = it } != null) {
                 onLog("$line\n")
             }

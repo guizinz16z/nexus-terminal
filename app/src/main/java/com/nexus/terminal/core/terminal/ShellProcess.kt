@@ -53,7 +53,7 @@ class ShellProcess(
 
             val reader = BufferedReader(InputStreamReader(proc.inputStream))
             val buffer = CharArray(1024)
-            var charsRead: Int
+            var charsRead = 0
 
             while (isRunning && reader.read(buffer).also { charsRead = it } != -1) {
                 val output = String(buffer, 0, charsRead)

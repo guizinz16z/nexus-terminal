@@ -53,7 +53,7 @@ class PythonEngine(
 
             val outThread = Thread {
                 val reader = BufferedReader(InputStreamReader(proc.inputStream))
-                var line: String?
+                var line: String? = null
                 while (reader.readLine().also { line = it } != null) {
                     val formatted = "$line\n"
                     outputAcc.append(formatted)
@@ -63,7 +63,7 @@ class PythonEngine(
 
             val errThread = Thread {
                 val reader = BufferedReader(InputStreamReader(proc.errorStream))
-                var line: String?
+                var line: String? = null
                 while (reader.readLine().also { line = it } != null) {
                     val formatted = "[stderr] $line\n"
                     errorAcc.append(formatted)

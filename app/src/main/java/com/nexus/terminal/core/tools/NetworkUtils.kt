@@ -24,7 +24,7 @@ object NetworkUtils {
             val proc = pb.start()
             val reader = BufferedReader(InputStreamReader(proc.inputStream))
             val sb = StringBuilder()
-            var line: String?
+            var line: String? = null
             while (reader.readLine().also { line = it } != null) {
                 sb.append(line).append("\n")
             }
