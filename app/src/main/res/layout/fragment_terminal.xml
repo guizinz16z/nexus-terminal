@@ -194,6 +194,14 @@
                 android:layout_height="@dimen/terminal_key_height"
                 android:layout_marginEnd="4dp"
                 android:text="-" />
+
+            <Button
+                android:id="@+id/key_tilde"
+                style="@style/Widget.Nexus.TerminalKey"
+                android:layout_width="40dp"
+                android:layout_height="@dimen/terminal_key_height"
+                android:layout_marginEnd="4dp"
+                android:text="~" />
         </LinearLayout>
     </HorizontalScrollView>
 
