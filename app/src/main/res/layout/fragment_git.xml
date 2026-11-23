@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/bg_dark"
+    android:orientation="vertical"
+    android:padding="16dp">
+
+    <!-- Header -->
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Controle de Versão Git"
+        android:textColor="@color/text_primary"
+        android:textSize="18sp"
+        android:textStyle="bold" />
+
+    <TextView
+        android:id="@+id/tv_git_branch"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="2dp"
+        android:text="Branch Atual: main"
+        android:textColor="@color/accent_violet"
+        android:textSize="12sp"
+        android:textStyle="bold" />
+
+    <!-- Actions (Clone, Pull, Push) -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="14dp"
+        android:orientation="horizontal">
+
+        <Button
+            android:id="@+id/btn_git_clone"
+            style="@style/Widget.Nexus.TerminalKey"
+            android:layout_width="0dp"
+            android:layout_height="38dp"
+            android:layout_marginEnd="6dp"
+            android:layout_weight="1"
+            android:text="Clone Repo"
+            android:textColor="@color/accent_cyan" />
+
+        <Button
+            android:id="@+id/btn_git_pull"
+            style="@style/Widget.Nexus.TerminalKey"
+            android:layout_width="0dp"
+            android:layout_height="38dp"
+            android:layout_marginEnd="6dp"
+            android:layout_weight="1"
+            android:text="Pull"
+            android:textColor="@color/text_primary" />
+
+        <Button
+            android:id="@+id/btn_git_push"
+            style="@style/Widget.Nexus.TerminalKey"
+            android:layout_width="0dp"
+            android:layout_height="38dp"
+            android:layout_weight="1"
+            android:text="Push"
+            android:textColor="@color/accent_emerald" />
+    </LinearLayout>
+
+    <!-- Commit Box -->
+    <com.google.android.material.card.MaterialCardView
+        style="@style/Widget.Nexus.GlassCard"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="12dp">
+
+            <EditText
+                android:id="@+id/et_commit_message"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@null"
+                android:hint="Mensagem do commit (ex: feat: add api endpoint)..."
+                android:maxLines="3"
+                android:textColor="@color/text_primary"
+                android:textColorHint="@color/text_muted"
+                android:textSize="13sp" />
+
+            <Button
+                android:id="@+id/btn_git_commit"
+                style="@style/Widget.Nexus.TerminalKey"
+                android:layout_width="match_parent"
+                android:layout_height="36dp"
+                android:layout_marginTop="8dp"
+                android:text="Fazer Commit das Alterações"
+                android:textColor="@color/accent_violet"
+                android:textStyle="bold" />
+        </LinearLayout>
+    </com.google.android.material.card.MaterialCardView>
+
+    <!-- Status & Modified Files -->
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:text="Arquivos Modificados"
+        android:textColor="@color/text_secondary"
+        android:textSize="14sp"
+        android:textStyle="bold" />
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_marginTop="8dp"
+        android:layout_weight="1"
+        android:background="@drawable/bg_glass_card"
+        android:padding="12dp">
+
+        <TextView
+            android:id="@+id/tv_git_status_log"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:fontFamily="monospace"
+            android:text="Status: Diretório limpo. Nenhuma alteração pendente."
+            android:textColor="@color/text_code"
+            android:textSize="12sp" />
+    </ScrollView>
+</LinearLayout>

@@ -1,0 +1,244 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/bg_dark"
+    android:orientation="vertical">
+
+    <!-- Top Bar: Sessions & Controls -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:background="@color/bg_card"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:paddingHorizontal="12dp">
+
+        <!-- Sessions Horizontal Scroll -->
+        <HorizontalScrollView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:scrollbars="none">
+
+            <LinearLayout
+                android:id="@+id/layout_session_tabs"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:id="@+id/btn_new_session"
+                    android:layout_width="wrap_content"
+                    android:layout_height="32dp"
+                    android:background="@drawable/bg_glass_card"
+                    android:gravity="center"
+                    android:paddingHorizontal="12dp"
+                    android:text="@string/terminal_new_session"
+                    android:textColor="@color/accent_cyan"
+                    android:textSize="12sp"
+                    android:textStyle="bold" />
+            </LinearLayout>
+        </HorizontalScrollView>
+
+        <!-- Clear Screen -->
+        <TextView
+            android:id="@+id/btn_terminal_clear"
+            android:layout_width="wrap_content"
+            android:layout_height="32dp"
+            android:layout_marginStart="8dp"
+            android:background="@drawable/bg_glass_card"
+            android:gravity="center"
+            android:paddingHorizontal="10dp"
+            android:text="@string/terminal_clear"
+            android:textColor="@color/text_secondary"
+            android:textSize="12sp" />
+
+        <!-- Stop Process (SIGINT) -->
+        <TextView
+            android:id="@+id/btn_terminal_stop"
+            android:layout_width="wrap_content"
+            android:layout_height="32dp"
+            android:layout_marginStart="8dp"
+            android:background="@drawable/bg_glass_card"
+            android:gravity="center"
+            android:paddingHorizontal="10dp"
+            android:text="@string/terminal_stop"
+            android:textColor="@color/accent_crimson"
+            android:textSize="12sp"
+            android:textStyle="bold" />
+    </LinearLayout>
+
+    <!-- Terminal Output Area -->
+    <ScrollView
+        android:id="@+id/scroll_terminal_output"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:background="#05070D"
+        android:fillViewport="true"
+        android:padding="8dp">
+
+        <TextView
+            android:id="@+id/tv_terminal_output"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:fontFamily="monospace"
+            android:lineSpacingExtra="2dp"
+            android:textColor="@color/text_code"
+            android:textIsSelectable="true"
+            android:textSize="13sp" />
+    </ScrollView>
+
+    <!-- Extra Keys Bar (ESC, TAB, CTRL, ALT, UP, DOWN, LEFT, RIGHT, |, /, -) -->
+    <HorizontalScrollView
+        android:layout_width="match_parent"
+        android:layout_height="40dp"
+        android:background="@color/bg_card_secondary"
+        android:scrollbars="none">
+
+        <LinearLayout
+            android:id="@+id/layout_extra_keys"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:paddingHorizontal="6dp">
+
+            <Button
+                android:id="@+id/key_esc"
+                style="@style/Widget.Nexus.TerminalKey"
+                android:layout_width="wrap_content"
+                android:layout_height="@dimen/terminal_key_height"
+                android:layout_marginEnd="4dp"
+                android:text="ESC" />
+
+            <Button
+                android:id="@+id/key_tab"
+                style="@style/Widget.Nexus.TerminalKey"
+                android:layout_width="wrap_content"
+                android:layout_height="@dimen/terminal_key_height"
+                android:layout_marginEnd="4dp"
+                android:text="TAB" />
+
+            <Button
+                android:id="@+id/key_ctrl"
+                style="@style/Widget.Nexus.TerminalKey"
+                android:layout_width="wrap_content"
+                android:layout_height="@dimen/terminal_key_height"
+                android:layout_marginEnd="4dp"
+                android:text="CTRL" />
+
+            <Button
+                android:id="@+id/key_alt"
+                style="@style/Widget.Nexus.TerminalKey"
+                android:layout_width="wrap_content"
+                android:layout_height="@dimen/terminal_key_height"
+                android:layout_marginEnd="4dp"
+                android:text="ALT" />
+
+            <Button
+                android:id="@+id/key_up"
+                style="@style/Widget.Nexus.TerminalKey"
+                android:layout_width="44dp"
+                android:layout_height="@dimen/terminal_key_height"
+                android:layout_marginEnd="4dp"
+                android:text="▲" />
+
+            <Button
+                android:id="@+id/key_down"
+                style="@style/Widget.Nexus.TerminalKey"
+                android:layout_width="44dp"
+                android:layout_height="@dimen/terminal_key_height"
+                android:layout_marginEnd="4dp"
+                android:text="▼" />
+
+            <Button
+                android:id="@+id/key_left"
+                style="@style/Widget.Nexus.TerminalKey"
+                android:layout_width="44dp"
+                android:layout_height="@dimen/terminal_key_height"
+                android:layout_marginEnd="4dp"
+                android:text="◀" />
+
+            <Button
+                android:id="@+id/key_right"
+                style="@style/Widget.Nexus.TerminalKey"
+                android:layout_width="44dp"
+                android:layout_height="@dimen/terminal_key_height"
+                android:layout_marginEnd="4dp"
+                android:text="▶" />
+
+            <Button
+                android:id="@+id/key_pipe"
+                style="@style/Widget.Nexus.TerminalKey"
+                android:layout_width="40dp"
+                android:layout_height="@dimen/terminal_key_height"
+                android:layout_marginEnd="4dp"
+                android:text="|" />
+
+            <Button
+                android:id="@+id/key_slash"
+                style="@style/Widget.Nexus.TerminalKey"
+                android:layout_width="40dp"
+                android:layout_height="@dimen/terminal_key_height"
+                android:layout_marginEnd="4dp"
+                android:text="/" />
+
+            <Button
+                android:id="@+id/key_dash"
+                style="@style/Widget.Nexus.TerminalKey"
+                android:layout_width="40dp"
+                android:layout_height="@dimen/terminal_key_height"
+                android:layout_marginEnd="4dp"
+                android:text="-" />
+        </LinearLayout>
+    </HorizontalScrollView>
+
+    <!-- Terminal Command Input Row -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:background="@color/bg_card"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:paddingHorizontal="8dp">
+
+        <TextView
+            android:id="@+id/tv_prompt_label"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:fontFamily="monospace"
+            android:text="nexus@android:~$ "
+            android:textColor="@color/accent_emerald"
+            android:textSize="12sp"
+            android:textStyle="bold" />
+
+        <EditText
+            android:id="@+id/et_terminal_input"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:background="@null"
+            android:fontFamily="monospace"
+            android:hint="@string/terminal_placeholder"
+            android:imeOptions="actionSend"
+            android:inputType="textNoSuggestions|textVisiblePassword"
+            android:maxLines="1"
+            android:textColor="@color/text_primary"
+            android:textColorHint="@color/text_muted"
+            android:textSize="13sp" />
+
+        <ImageView
+            android:id="@+id/btn_terminal_send"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:background="@drawable/bg_glass_card"
+            android:contentDescription="@string/terminal_send"
+            android:padding="6dp"
+            android:src="@drawable/ic_play"
+            app:tint="@color/accent_cyan" />
+    </LinearLayout>
+</LinearLayout>

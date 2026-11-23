@@ -1,0 +1,30 @@
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <string name="app_name">NEXUS TERMINAL</string>
+    <string name="app_tagline">Mobile Dev &amp; Linux Station</string>
+    <string name="version_text">v1.0.0 Pro</string>
+
+    <!-- Navigation -->
+    <string name="nav_dashboard">Dashboard</string>
+    <string name="nav_terminal">Terminal</string>
+    <string name="nav_editor">Editor</string>
+    <string name="nav_files">Arquivos</string>
+    <string name="nav_projects">Projetos</string>
+    <string name="nav_packages">Pacotes</string>
+    <string name="nav_git">Git</string>
+    <string name="nav_tools">Ferramentas</string>
+    <string name="nav_ai">AI Assistant</string>
+    <string name="nav_settings">Ajustes</string>
+
+    <!-- Terminal -->
+    <string name="terminal_new_session">+ Sessão</string>
+    <string name="terminal_clear">Limpar</string>
+    <string name="terminal_stop">Parar</string>
+    <string name="terminal_send">Enviar</string>
+    <string name="terminal_placeholder">Digite um comando bash/sh...</string>
+
+    <!-- Python & Packages -->
+    <string name="python_runtime_ready">Python 3.11 Pronto</string>
+    <string name="pip_search_hint">Buscar pacote no PyPI (ex: requests, flask)...</string>
+    <string name="pip_install">Instalar</string>
+    <string name="pip_uninstall">Desinstalar</string>
+</resources>

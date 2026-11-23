@@ -1,0 +1,88 @@
+name: Build Nexus Terminal APK
+
+on:
+  push:
+    branches: [ "main", "master" ]
+  pull_request:
+    branches: [ "main", "master" ]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    name: Build Android APK
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Set up Java 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v3
+        with:
+          gradle-version: '8.4'
+
+      - name: Grant execute permission for gradlew
+        run: |
+          if [ -f "./gradlew" ]; then
+            chmod +x ./gradlew
+          fi
+
+      - name: Build Debug & Release APK with Gradle
+        run: |
+          gradle assembleDebug assembleRelease --stacktrace
+
+      - name: Verify APK Generation
+        run: |
+          echo "=== Generated APK Files ==="
+          find app/build/outputs/apk/ -name "*.apk" -ls
+
+      - name: Upload Debug APK Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: NexusTerminal-Debug-APK
+          path: app/build/outputs/apk/debug/*.apk
+          retention-days: 30
+
+      - name: Upload Release APK Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: NexusTerminal-Release-APK
+          path: app/build/outputs/apk/release/*.apk
+          retention-days: 30
+
+      - name: Create GitHub Release (On Push to Main)
+        if: startsWith(github.ref, 'refs/heads/main') || startsWith(github.ref, 'refs/heads/master')
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: v1.0.0-${{ github.run_number }}
+          name: Nexus Terminal v1.0.0 (Build #${{ github.run_number }})
+          body: |
+            ## 🚀 Nexus Terminal - Android Release
+            
+            Ambiente completo de desenvolvimento para Android:
+            - 💻 Terminal Linux Interativo
+            - 🐍 Runtime Python com suporte a Scripts e PIP
+            - 📝 Editor de Código Profissional com Syntax Highlighting
+            - 📁 Gerenciador de Arquivos & Projetos
+            - 🌿 Git Integrado & Ferramentas de Rede
+            - 🤖 Assistente AI para Desenvolvedores
+            
+            ### Como Instalar no Celular:
+            1. Baixe o arquivo `.apk` anexado abaixo.
+            2. Toque no arquivo baixado no seu celular Android.
+            3. Se solicitado, permita a instalação de fontes desconhecidas.
+            4. Abra o **NEXUS TERMINAL** e aproveite!
+          files: |
+            app/build/outputs/apk/debug/*.apk
+            app/build/outputs/apk/release/*.apk
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

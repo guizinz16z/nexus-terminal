@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/bg_dark"
+    android:orientation="vertical"
+    android:padding="16dp">
+
+    <!-- Header -->
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Gerenciador de Pacotes PIP"
+        android:textColor="@color/text_primary"
+        android:textSize="18sp"
+        android:textStyle="bold" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="2dp"
+        android:text="Instale e gerencie bibliotecas Python diretamente no celular"
+        android:textColor="@color/text_secondary"
+        android:textSize="12sp" />
+
+    <!-- Search / Install Bar -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:layout_marginTop="14dp"
+        android:background="@drawable/bg_glass_card"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:paddingHorizontal="12dp">
+
+        <EditText
+            android:id="@+id/et_package_name"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:background="@null"
+            android:hint="@string/pip_search_hint"
+            android:inputType="textNoSuggestions"
+            android:textColor="@color/text_primary"
+            android:textColorHint="@color/text_muted"
+            android:textSize="13sp" />
+
+        <Button
+            android:id="@+id/btn_pip_install"
+            style="@style/Widget.Nexus.TerminalKey"
+            android:layout_width="wrap_content"
+            android:layout_height="36dp"
+            android:text="@string/pip_install"
+            android:textColor="@color/accent_emerald"
+            android:textStyle="bold" />
+    </LinearLayout>
+
+    <!-- Pip Output Log Terminal Card -->
+    <com.google.android.material.card.MaterialCardView
+        style="@style/Widget.Nexus.GlassCard"
+        android:layout_width="match_parent"
+        android:layout_height="130dp"
+        android:layout_marginTop="14dp">
+
+        <ScrollView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="#05070D"
+            android:padding="8dp">
+
+            <TextView
+                android:id="@+id/tv_pip_log"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:fontFamily="monospace"
+                android:text="[pip] Nexus Package Manager inicializado.\nPronto para instalar bibliotecas do PyPI."
+                android:textColor="@color/accent_cyan"
+                android:textSize="11sp" />
+        </ScrollView>
+    </com.google.android.material.card.MaterialCardView>
+
+    <!-- Installed Packages Title -->
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:text="Pacotes Instalados"
+        android:textColor="@color/text_secondary"
+        android:textSize="14sp"
+        android:textStyle="bold" />
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/rv_packages"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_marginTop="8dp"
+        android:layout_weight="1" />
+</LinearLayout>

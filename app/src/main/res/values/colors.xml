@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Brand / Deep Palette -->
+    <color name="bg_dark">#0A0E17</color>
+    <color name="bg_card">#111827</color>
+    <color name="bg_card_secondary">#1F2937</color>
+    <color name="bg_card_glass">#1A2035</color>
+    <color name="bg_surface_overlay">#232A42</color>
+    <color name="stroke_glass">#2D3748</color>
+    <color name="stroke_active">#4F46E5</color>
+
+    <!-- Accents -->
+    <color name="accent_violet">#8B5CF6</color>
+    <color name="accent_violet_dark">#7C3AED</color>
+    <color name="accent_indigo">#6366F1</color>
+    <color name="accent_blue">#3B82F6</color>
+    <color name="accent_cyan">#06B6D4</color>
+    <color name="accent_emerald">#10B981</color>
+    <color name="accent_amber">#F59E0B</color>
+    <color name="accent_crimson">#EF4444</color>
+
+    <!-- Typography -->
+    <color name="text_primary">#F9FAFB</color>
+    <color name="text_secondary">#9CA3AF</color>
+    <color name="text_muted">#6B7280</color>
+    <color name="text_code">#E2E8F0</color>
+
+    <!-- Terminal ANSI 16 Colors -->
+    <color name="term_black">#1E293B</color>
+    <color name="term_red">#F87171</color>
+    <color name="term_green">#34D399</color>
+    <color name="term_yellow">#FBBF24</color>
+    <color name="term_blue">#60A5FA</color>
+    <color name="term_magenta">#C084FC</color>
+    <color name="term_cyan">#38BDF8</color>
+    <color name="term_white">#F1F5F9</color>
+    <color name="term_bright_black">#475569</color>
+    <color name="term_bright_red">#EF4444</color>
+    <color name="term_bright_green">#10B981</color>
+    <color name="term_bright_yellow">#F59E0B</color>
+    <color name="term_bright_blue">#3B82F6</color>
+    <color name="term_bright_magenta">#8B5CF6</color>
+    <color name="term_bright_cyan">#06B6D4</color>
+    <color name="term_bright_white">#FFFFFF</color>
+
+    <!-- Syntax Colors -->
+    <color name="syntax_keyword">#C084FC</color>
+    <color name="syntax_string">#34D399</color>
+    <color name="syntax_number">#FBBF24</color>
+    <color name="syntax_comment">#64748B</color>
+    <color name="syntax_function">#60A5FA</color>
+    <color name="syntax_operator">#F87171</color>
+    <color name="syntax_builtin">#38BDF8</color>
+</resources>
